@@ -12,3 +12,5 @@
 
 
 - `pip install -r requirements.txt` - для установки зависимостей
+
+- `python manage.py runserver` - запуск сайта на локальном сервере по адресу http://127.0.0.1:8000/
