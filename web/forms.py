@@ -45,6 +45,7 @@ class TaskForm(forms.ModelForm):
     priority = forms.ChoiceField(
         choices=PRIORITY_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Приоритет',
     )
 
     class Meta:
