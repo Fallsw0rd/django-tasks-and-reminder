@@ -1,0 +1,15 @@
+{% extends 'web/base.html' %}
+{% block title %}Задача{% endblock %}
+
+{% block content %}
+    {% if form.title.value %}
+        <h2>Редактирование задачи "{{ form.title.value }}"</h2>
+    {% else %}
+        <h2>Создание новой задачи</h2>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% if form.title.value %}Изменить{% else %}Создать{% endif %}</button>
+    </form>
+{% endblock %}

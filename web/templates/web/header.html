@@ -1,9 +1,16 @@
 <header>
-    <div class="left">
-        <p>TaskReminder</p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1><a href="{% url 'index' %}">TaskReminder</a></h1>
+        </div>
+        <div>
+            {% if user.is_active %}
+            <p>Вы авторизованы как <b>{{ user.username }}</b> <a href="{% url 'logout' %}" class="logout">Выйти</a></p>
+            {% else %}
+            <a href="{% url 'registration' %}" class="register">Зарегистрироваться</a>
+            <a href="{% url 'login' %}" class="login">Войти</a>
+            {% endif %}
+        </div>
     </div>
-    <div class="right">
-        <a href="{% url 'registration' %}" class="register">Зарегистрироваться</a>
-        <a href="#" class="login">Войти</a>
-    </div>
+    <hr>
 </header>

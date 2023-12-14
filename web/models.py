@@ -17,12 +17,11 @@ class Task(models.Model):
     priority = models.IntegerField()
     task_list = models.ForeignKey(TaskList, on_delete=models.CASCADE)
 
+    def has_reminders(self):
+        return self.reminder_set.exists()
+
 
 class Reminder(models.Model):
     reminder_datetime = models.DateTimeField()
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
-
-class Rating(models.Model):
-    rating_value = models.IntegerField()
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
