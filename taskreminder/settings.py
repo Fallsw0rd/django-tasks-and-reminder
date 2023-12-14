@@ -76,8 +76,11 @@ WSGI_APPLICATION = 'taskreminder.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'taskreminder',
+        'HOST': 'localhost',
+        'USER': 'postgres',
+        'PASSWORD': 'aswdzxc123',
     }
 }
 
