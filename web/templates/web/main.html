@@ -1,0 +1,20 @@
+{% extends 'web/base.html' %}
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+{% if user.is_active %}
+<a href="{% url 'add_task_list' %}">Создать новый список задач</a>
+<ul>
+    {% for list in tasklists %}
+    <li>
+        <b>{{ list.name }}</b> {% if list.task_set.exists %}<span style="color: red;">(Напоминание)</span>{% endif %}<br>
+        <a href="{% url 'list_tasks' list.id %}">Перейти</a>
+        <a href="{% url 'edit_task_list' list.id %}">Изменить</a>
+    </li>
+    <br>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Для работы требуется авторизация на сайте</p>
+{% endif %}
+{% endblock %}

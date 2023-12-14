@@ -1,0 +1,15 @@
+{% extends 'web/base.html' %}
+{% block title %}Напоминание{% endblock %}
+
+{% block content %}
+    {% if form.reminder_datetime.value %}
+        <h2>Редактирование напоминания для задачи "{{ task.title }}"</h2>
+    {% else %}
+        <h2>Создание нового напоминания для задачи "{{ task.title }}"</h2>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% if form.reminder_datetime.value %}Изменить{% else %}Создать{% endif %}</button>
+    </form>
+{% endblock %}

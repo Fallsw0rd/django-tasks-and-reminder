@@ -1,0 +1,17 @@
+{% extends 'web/base.html' %}
+{% block title %}Напоминания{% endblock %}
+
+{% block content %}
+<a href="{% url 'list_tasks' ts_id=task.task_list.id %}">Обратно</a>
+<h1>Задача "{{ task.title }}"</h1>
+<a href="{% url 'add_reminder' task_id=task.id %}">Создать новое напоминание</a>
+<ul>
+    {% for reminder in reminders %}
+    <li>
+        <span>{{ reminder.reminder_datetime }}</span>
+        <a href="{% url 'edit_reminder' task_id=task.id cur_reminder=reminder.id %}">Изменить</a>
+        <a href="{% url 'delete_reminder' task_id=task.id cur_reminder=reminder.id %}">Удалить</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

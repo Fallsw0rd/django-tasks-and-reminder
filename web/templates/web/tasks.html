@@ -1,0 +1,43 @@
+{% extends 'web/base.html' %}
+{% block title %}Задачи{% endblock %}
+
+{% block content %}
+<a href="{% url 'index' %}">В главное меню</a>
+<h1>{{ task_list.name }}</h1>
+<a href="{% url 'add_task' ts_id=task_list.id %}">Создать новую задачу</a>
+<ul>
+    {% for task in tasks %}
+    <li>
+        {% for reminder in reminder_task %}
+        {% if reminder.task == task %}
+        <span style="color: #fff; background-color: black;padding: 0 5px;">Напоминание</span>
+        {% endif %}
+        {% endfor %}
+        <b>{{ task.title }}</b>
+        <span><small>Приоритет: {{ task.priority }}</small></span>
+        {% if task.due_date == today.date %}<span style="color: red;">(Последний день)</span>{% endif %}
+        <p>{{ task.description }}</p>
+        <span>{{ task.due_date|date:'d.m.Y' }}</span>
+        <a href="{% url 'edit_task' ts_id=task_list.id cur_task=task.id %}">Изменить</a>
+        <a href="{% url 'delete_task' ts_id=task_list.id cur_task=task.id %}">Удалить</a>
+        <a href="{% url 'list_reminders' task_id=task.id %}">Напомнить</a>
+    </li>
+    <br>
+    {% endfor %}
+</ul>
+{% if overdue_tasks %}
+<h2>Просроченные задачи</h2>
+<ul>
+    {% for overdue_task in overdue_tasks %}
+    <li>
+        <b>{{ overdue_task.title }}</b>
+        <span><small>Приоритет: {{ overdue_task.priority }}</small></span>
+        <p>{{ overdue_task.description }}</p>
+        <span>{{ overdue_task.due_date|date:'d.m.Y' }}</span>
+        <a href="{% url 'delete_task' ts_id=task_list.id cur_task=overdue_task.id %}">Удалить</a>
+    </li>
+    <br>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
