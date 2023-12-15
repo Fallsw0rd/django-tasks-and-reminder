@@ -25,4 +25,7 @@ urlpatterns = [
     path('tasks/<int:task_id>/reminders/add/', views.edit_reminder, name='add_reminder'),
     path('tasks/<int:task_id>/reminders/<int:cur_reminder>/edit/', views.edit_reminder, name='edit_reminder'),
     path('tasks/<int:task_id>/reminders/<int:cur_reminder>/delete/', views.delete_reminder, name='delete_reminder'),
+
+    # analytics
+    path('analytics/', views.analytics_view, name='analytics'),
 ]
