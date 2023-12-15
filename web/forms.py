@@ -63,3 +63,26 @@ class ReminderForm(forms.ModelForm):
         widgets = {
             "reminder_datetime": forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M')
         }
+
+
+class TaskFilterForm(forms.Form):
+    PRIORITY_CHOICES = [
+        ('', 'Приоритет'),
+        (1, '1 - Низкий'),
+        (2, '2 - Ниже среднего'),
+        (3, '3 - Средний'),
+        (4, '4 - Выше среднего'),
+        (5, '5 - Высокий'),
+    ]
+    search = forms.CharField(label='',widget=forms.TextInput(attrs={'placeholder': 'Поиск'}), required=False)
+    priority = forms.ChoiceField(
+        choices=PRIORITY_CHOICES,
+        label='',
+        widget=forms.Select(attrs={'class': 'form-control'}), required=False
+    )
+    choose_date = forms.DateField(
+        label='Дата срока задачи',
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        input_formats=['%Y-%m-%d'],
+        required=False,
+    )

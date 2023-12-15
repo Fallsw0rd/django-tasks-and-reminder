@@ -2,6 +2,9 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h1><a href="{% url 'index' %}">TaskReminder</a></h1>
+            {% if user.is_active %}
+            <h3><a href="#">Статистика</a></h3>
+            {% endif %}
         </div>
         <div>
             {% if user.is_active %}

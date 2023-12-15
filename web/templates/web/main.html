@@ -14,6 +14,19 @@
     <br>
     {% endfor %}
 </ul>
+<nav>
+    {% if tasklists.has_previous %}
+        <a href="?page=1">В начало</a>
+        <a href="?page={{ tasklists.previous_page_number }}">Предыдующая страница</a>
+    {% endif %}
+
+    страница {{ tasklists.number }} из {{ tasklists.paginator.num_pages }}
+
+    {% if tasklists.has_next %}
+        <a href="?page={{ tasklists.next_page_number }}">Следующая страница</a>
+        <a href="?page={{ tasklists.paginator.num_pages }}">В конец</a>
+    {% endif %}
+</nav>
 {% else %}
 <p>Для работы требуется авторизация на сайте</p>
 {% endif %}
