@@ -1,9 +1,10 @@
 from datetime import datetime
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 
-from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm
+from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm, TaskFilterForm
 from web.models import TaskList, Task, Reminder
 
 User = get_user_model()
@@ -12,8 +13,10 @@ User = get_user_model()
 def index_view(request):
     user = request.user
     if user.is_authenticated:
-        task_lists = TaskList.objects.filter(user=user)
-        return render(request, "web/main.html", {'tasklists': task_lists})
+        task_lists = TaskList.objects.filter(user=user).select_related('user')
+        page_number = request.GET.get('page', 1)
+        paginator = Paginator(task_lists, per_page=5)
+        return render(request, "web/main.html", {'tasklists': paginator.get_page(page_number)})
     else:
         return render(request, "web/main.html")
 
@@ -74,18 +77,46 @@ def edit_task_list(request, id=None):
 
 
 @login_required
+def delete_task_list(request, id=None):
+    task_list = get_object_or_404(TaskList, id=id)
+    task_list.delete()
+    return redirect('index')
+
+
+@login_required
 def list_tasks(request, ts_id=None):
     today = datetime.now()
     task_list = get_object_or_404(TaskList, pk=ts_id)
-    tasks = Task.objects.filter(task_list=task_list, due_date__gte=today).order_by('due_date', '-priority')
-    overdue_tasks = Task.objects.filter(task_list=task_list, due_date__lt=today).order_by('-due_date', '-priority')
-    reminder_task = Reminder.objects.filter(task_id__in=tasks.values_list('id'),
-                                            reminder_datetime__time__lte=today,
-                                            reminder_datetime__date__lte=today)
+    tasks = (Task.objects.filter(task_list=task_list, due_date__gte=today).order_by('due_date', '-priority')
+             .select_related('task_list'))
+    overdue_tasks = (Task.objects.filter(task_list=task_list, due_date__lt=today).order_by('due_date', '-priority')
+                     .select_related('task_list'))
+    reminder_task = Reminder.objects.filter(
+        task_id__in=tasks.values_list('id'),
+        reminder_datetime__time__lte=today,
+        reminder_datetime__date__lte=today
+    )
 
-    return render(request, 'web/tasks.html', {'tasks': tasks,
-                                              'overdue_tasks': overdue_tasks,
-                                              'task_list': task_list,
+    filter_form = TaskFilterForm(request.GET)
+    filter_form.is_valid()
+    filters = filter_form.cleaned_data
+
+    if filters['search']:
+        tasks = tasks.filter(title__icontains=filters['search'])
+
+    if filters['priority'] != '':
+        tasks = tasks.filter(priority=filters['priority'])
+
+    if filters['choose_date']:
+        tasks = tasks.filter(due_date=filters['choose_date'])
+
+    total_count = tasks.count()
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(tasks, per_page=5)
+
+    return render(request, 'web/tasks.html', {'tasks': paginator.get_page(page_number),
+                                              'overdue_tasks': overdue_tasks, 'total_count': total_count,
+                                              'task_list': task_list, 'filter_form': filter_form,
                                               'today': today, 'reminder_task': reminder_task})
 
 
@@ -102,6 +133,7 @@ def edit_task(request, ts_id=None, cur_task=None):
             return redirect('list_tasks', ts_id=ts_id)
 
     return render(request, 'web/create_task.html', {'form': form})
+
 
 @login_required
 def delete_task(request, ts_id=None, cur_task=None):
