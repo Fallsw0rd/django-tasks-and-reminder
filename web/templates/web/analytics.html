@@ -1,0 +1,22 @@
+{% extends 'web/base.html' %}
+{% block title %}Аналитика{% endblock %}
+
+{% block content %}
+<a href="{% url 'index' %}">В главное меню</a>
+<h2>Аналитика задач</h2>
+<p>Всего <b>{{ overall_stat.id__count }}</b> задач.</p>
+<p>Максимальная дата срока {{ overall_stat.due_date__max }}.</p>
+<p>Минимальная дата срока {{ overall_stat.due_date__min }}.</p>
+<h3>Аналитика по дням</h3>
+<ul>
+    {% for day_stat in days_stat %}
+        <li><b>{{ day_stat.date }}</b>- {{ day_stat.total_tasks }} задач,
+            {% if day_stat.tasks_with_reminders != 0 %}
+                {{ day_stat.tasks_with_reminders }} с напоминаниями
+            {% else %}
+                без напоминаний
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

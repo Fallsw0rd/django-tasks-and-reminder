@@ -2,6 +2,8 @@ from datetime import datetime
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Count, Max, Min, Q
+from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect, get_object_or_404
 
 from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm, TaskFilterForm
@@ -170,3 +172,23 @@ def delete_reminder(request, task_id=None, cur_reminder=None):
     reminder = get_object_or_404(Reminder, id=cur_reminder)
     reminder.delete()
     return redirect('list_reminders', task_id=task_id)
+
+
+@login_required
+def analytics_view(request):
+    overall_stat = Task.objects.aggregate(
+        Count('id'),
+        Max('due_date'),
+        Min('due_date'),
+    )
+    days_stat = (
+        Task.objects.all()
+        .annotate(date=TruncDate('due_date'))
+        .values('date')
+        .annotate(
+            total_tasks=Count('id'),
+            tasks_with_reminders=Count('id',filter=Q(reminder__isnull=False)))
+    ).order_by('due_date')
+
+    return render(request, 'web/analytics.html', {'overall_stat': overall_stat,
+                                                  'days_stat': days_stat})
