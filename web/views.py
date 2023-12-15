@@ -6,6 +6,7 @@ from django.db.models import Count, Max, Min, Q
 from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.cache import cache_page
 
 from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm, TaskFilterForm, ImportForm
 from web.models import TaskList, Task, Reminder
@@ -14,6 +15,7 @@ from web.services import filter_tasks, export_tasks_csv, import_tasks_from_csv
 User = get_user_model()
 
 
+@cache_page(20)
 def index_view(request):
     user = request.user
     if user.is_authenticated:
@@ -87,6 +89,7 @@ def delete_task_list(request, id=None):
     return redirect('index')
 
 
+@cache_page(20)
 @login_required
 def list_tasks(request, ts_id=None):
     today = datetime.now()
