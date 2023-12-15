@@ -3,7 +3,10 @@
         <div>
             <h1><a href="{% url 'index' %}">TaskReminder</a></h1>
             {% if user.is_active %}
-            <h3><a href="{% url 'analytics' %}">Статистика</a></h3>
+            <div style="display: flex;">
+                <h3 style="padding: 0 10px;"><a href="{% url 'analytics' %}">Статистика</a></h3>
+                <h3 style="padding: 0 10px;"><a href="{% url 'import' %}">Импорт</a></h3>
+            </div>
             {% endif %}
         </div>
         <div>

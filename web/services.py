@@ -1,4 +1,8 @@
 import csv
+import io
+from datetime import datetime
+
+from web.models import Task, TaskList
 
 
 def filter_tasks(tasks_qs, filters: dict):
@@ -24,3 +28,25 @@ def export_tasks_csv(tasks_qs, response):
 
     return response
 
+
+def import_tasks_from_csv(file):
+    file_content = file.read().decode('utf-8')
+
+    csv_file = io.StringIO(file_content)
+
+    csv_reader = csv.reader(csv_file)
+    next(csv_reader)
+
+    for row in csv_reader:
+        title, description, due_date_str, priority_str, task_list_name = row
+        due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+        priority = int(priority_str)
+        task_list, created = TaskList.objects.get_or_create(name=task_list_name)
+
+        Task.objects.create(
+            title=title,
+            description=description,
+            due_date=due_date,
+            priority=priority,
+            task_list=task_list
+        )

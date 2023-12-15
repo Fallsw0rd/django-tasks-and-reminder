@@ -7,9 +7,9 @@ from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
-from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm, TaskFilterForm
+from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm, TaskFilterForm, ImportForm
 from web.models import TaskList, Task, Reminder
-from web.services import filter_tasks, export_tasks_csv
+from web.services import filter_tasks, export_tasks_csv, import_tasks_from_csv
 
 User = get_user_model()
 
@@ -192,3 +192,13 @@ def analytics_view(request):
 
     return render(request, 'web/analytics.html', {'overall_stat': overall_stat,
                                                   'days_stat': days_stat})
+
+
+@login_required
+def import_view(request):
+    if request.method == 'POST':
+        form = ImportForm(files=request.FILES)
+        if form.is_valid():
+            import_tasks_from_csv(form.cleaned_data['file'])
+            return redirect('index')
+    return render(request, 'web/import.html',{'form': ImportForm()})
