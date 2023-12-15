@@ -4,10 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Q
 from django.db.models.functions import TruncDate
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from web.forms import RegistrationForm, AuthForm, TaskListForm, TaskForm, ReminderForm, TaskFilterForm
 from web.models import TaskList, Task, Reminder
+from web.services import filter_tasks, export_tasks_csv
 
 User = get_user_model()
 
@@ -101,20 +103,18 @@ def list_tasks(request, ts_id=None):
 
     filter_form = TaskFilterForm(request.GET)
     filter_form.is_valid()
-    filters = filter_form.cleaned_data
-
-    if filters['search']:
-        tasks = tasks.filter(title__icontains=filters['search'])
-
-    if filters['priority'] != '':
-        tasks = tasks.filter(priority=filters['priority'])
-
-    if filters['choose_date']:
-        tasks = tasks.filter(due_date=filters['choose_date'])
+    tasks = filter_tasks(tasks, filter_form.cleaned_data)
 
     total_count = tasks.count()
     page_number = request.GET.get('page', 1)
     paginator = Paginator(tasks, per_page=5)
+
+    if request.GET.get('export') == 'csv':
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={'Content-Disposition': 'attachment; filename=tasks.csv'}
+        )
+        return export_tasks_csv(tasks, response)
 
     return render(request, 'web/tasks.html', {'tasks': paginator.get_page(page_number),
                                               'overdue_tasks': overdue_tasks, 'total_count': total_count,
