@@ -28,4 +28,7 @@ urlpatterns = [
 
     # analytics
     path('analytics/', views.analytics_view, name='analytics'),
+
+    # import
+    path('import/', views.import_view, name='import'),
 ]

@@ -1,0 +1,11 @@
+{% extends 'web/base.html' %}
+{% block title %}Импорт{% endblock %}
+
+{% block content %}
+<h2>Импорт CSV-файл</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Импортировать</button>
+    </form>
+{% endblock %}

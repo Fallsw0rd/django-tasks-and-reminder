@@ -86,3 +86,7 @@ class TaskFilterForm(forms.Form):
         input_formats=['%Y-%m-%d'],
         required=False,
     )
+
+
+class ImportForm(forms.Form):
+    file = forms.FileField()
